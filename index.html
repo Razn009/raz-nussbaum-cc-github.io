@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hogwarts: A Wizard's Journey</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gryffindor-primary: #740001;
+            --gryffindor-secondary: #D3A625;
+            --slytherin-primary: #1A472A;
+            --slytherin-secondary: #5D5D5D;
+            --ravenclaw-primary: #0E1A40;
+            --ravenclaw-secondary: #946B2D;
+            --hufflepuff-primary: #ECB939;
+            --hufflepuff-secondary: #372E29;
+            --bg-dark: #0a0a1a;
+            --bg-medium: #1a1a2e;
+            --text-gold: #D4AF37;
+            --text-light: #e0d5c1;
+            --parchment: #f4e8c1;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Floating particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--text-gold);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float-particle 6s infinite;
+        }
+
+        @keyframes float-particle {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.3; }
+            100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+        }
+
+        /* Main container */
+        .game-container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Screen base */
+        .screen {
+            display: none;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Title screen */
+        .game-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 3rem;
+            color: var(--text-gold);
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5), 0 0 60px rgba(212, 175, 55, 0.2);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .game-subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            opacity: 0.8;
+            letter-spacing: 3px;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: 'Cinzel', serif;
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            border: 2px solid var(--text-gold);
+            background: transparent;
+            color: var(--text-gold);
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            margin: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.15), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            background: rgba(212, 175, 55, 0.15);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-small {
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Sorting Hat */
+        .sorting-hat-icon {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            animation: hat-float 3s ease-in-out infinite;
+        }
+
+        @keyframes hat-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .sorting-question {
+            font-size: 1.15rem;
+            margin: 25px 0 20px;
+            color: var(--parchment);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .sorting-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .sorting-option {
+            font-family: 'Lora', serif;
+            padding: 14px 18px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .sorting-option:hover {
+            border-color: var(--text-gold);
+            background: rgba(212, 175, 55, 0.1);
+            transform: scale(1.02);
+        }
+
+        /* House reveal */
+        .house-crest {
+            font-size: 5rem;
+            margin-bottom: 15px;
+        }
+
+        .house-name {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px currentColor;
+        }
+
+        .house-motto {
+            font-style: italic;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* HUD */
+        .hud {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .hud-item {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .hud-item span {
+            color: var(--text-gold);
+            font-weight: 700;
+        }
+
+        /* Trivia */
+        .trivia-category {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            color: var(--text-gold);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .trivia-question {
+            font-size: 1.25rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: var(--parchment);
+        }
+
+        .trivia-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .trivia-option {
+            font-family: 'Lora', serif;
+            padding: 14px 20px;
+            font-size: 1rem;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .trivia-option:hover:not(.disabled) {
+            border-color: var(--text-gold);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .trivia-option.correct {
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .trivia-option.incorrect {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .trivia-option.disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        .trivia-option.disabled.correct {
+            opacity: 1;
+        }
+
+        .trivia-feedback {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            min-height: 60px;
+        }
+
+        .trivia-feedback .points {
+            color: var(--text-gold);
+            font-weight: 700;
+        }
+
+        /* Spell Duel */
+        .duel-arena {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .duelist {
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .duelist-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .duelist-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .health-bar-container {
+            width: 140px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .health-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c, #2ecc71);
+            transition: width 0.5s ease;
+        }
+
+        .duel-vs {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 1.5rem;
+            color: var(--text-gold);
+        }
+
+        .spell-choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        .spell-btn {
+            font-family: 'Cinzel', serif;
+            padding: 14px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .spell-btn:hover {
+            border-color: var(--text-gold);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .spell-btn .spell-name {
+            display: block;
+            color: var(--text-gold);
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .spell-btn .spell-type {
+            display: block;
+            font-family: 'Lora', serif;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .duel-log {
+            margin-top: 15px;
+            font-style: italic;
+            min-height: 50px;
+            color: var(--parchment);
+            line-height: 1.5;
+        }
+
+        /* Spell flash effect */
+        .spell-flash {
+            animation: flash 0.3s ease;
+        }
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; filter: brightness(3); }
+            100% { opacity: 1; }
+        }
+
+        /* Year summary */
+        .year-summary {
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 30px;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .year-summary h2 {
+            font-family: 'Cinzel Decorative', cursive;
+            color: var(--text-gold);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-box {
+            padding: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-box .stat-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .stat-box .stat-value {
+            font-size: 1.5rem;
+            color: var(--text-gold);
+            font-weight: 700;
+        }
+
+        /* Final screen */
+        .final-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 2.2rem;
+            color: var(--text-gold);
+            margin-bottom: 25px;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .final-stats {
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+
+        .final-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .final-stat-label {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+
+        .final-stat-value {
+            color: var(--text-gold);
+            font-weight: 700;
+        }
+
+        .wizard-rank {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 1.5rem;
+            color: var(--text-gold);
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid var(--text-gold);
+            display: inline-block;
+        }
+
+        /* Progress bar for year */
+        .year-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .year-progress-bar {
+            height: 100%;
+            background: var(--text-gold);
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .game-title { font-size: 2rem; }
+            .sorting-options { grid-template-columns: 1fr; }
+            .spell-choices { grid-template-columns: 1fr; }
+            .summary-stats { grid-template-columns: 1fr; }
+            .duel-arena { flex-direction: column; }
+            .hud { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="game-container">
+
+    <!-- TITLE SCREEN -->
+    <div class="screen active" id="screen-title">
+        <div style="font-size: 4rem; margin-bottom: 20px;">&#9733;</div>
+        <h1 class="game-title">Hogwarts</h1>
+        <p class="game-subtitle">A Wizard's Journey</p>
+        <p style="max-width: 500px; margin: 0 auto 35px; line-height: 1.8; opacity: 0.7;">
+            Enter the wizarding world. Be sorted into your house, prove your knowledge
+            of magic, and duel dark forces across seven years at Hogwarts School of
+            Witchcraft and Wizardry.
+        </p>
+        <button class="btn" onclick="startSorting()">Begin Your Journey</button>
+    </div>
+
+    <!-- NAME ENTRY -->
+    <div class="screen" id="screen-name">
+        <div style="font-size: 3rem; margin-bottom: 20px;">&#9993;</div>
+        <h2 style="font-family: 'Cinzel', serif; color: var(--text-gold); margin-bottom: 10px;">A Letter Has Arrived</h2>
+        <p style="margin-bottom: 30px; opacity: 0.8; font-style: italic;">
+            "Dear wizard, we are pleased to inform you that you have been accepted
+            at Hogwarts School of Witchcraft and Wizardry."
+        </p>
+        <div style="margin-bottom: 25px;">
+            <input type="text" id="player-name-input" placeholder="Enter your wizard name..."
+                   maxlength="20"
+                   style="font-family: 'Lora', serif; padding: 12px 20px; font-size: 1.1rem;
+                          background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.4);
+                          color: var(--parchment); text-align: center; width: 280px; outline: none;"
+                   onkeydown="if(event.key==='Enter') confirmName()">
+        </div>
+        <button class="btn" onclick="confirmName()">Accept Letter</button>
+    </div>
+
+    <!-- SORTING CEREMONY -->
+    <div class="screen" id="screen-sorting">
+        <div class="sorting-hat-icon">&#127913;</div>
+        <h2 style="font-family: 'Cinzel', serif; color: var(--text-gold); margin-bottom: 5px;">The Sorting Ceremony</h2>
+        <p class="sorting-question" id="sorting-question"></p>
+        <div class="sorting-options" id="sorting-options"></div>
+        <p style="margin-top: 15px; font-size: 0.8rem; opacity: 0.5;" id="sorting-progress"></p>
+    </div>
+
+    <!-- HOUSE REVEAL -->
+    <div class="screen" id="screen-house-reveal">
+        <div class="house-crest" id="house-crest"></div>
+        <h2 class="house-name" id="house-name-display"></h2>
+        <p class="house-motto" id="house-motto"></p>
+        <p style="margin-bottom: 30px; line-height: 1.7;" id="house-description"></p>
+        <button class="btn" onclick="startYear()">Enter Hogwarts</button>
+    </div>
+
+    <!-- YEAR INTRO -->
+    <div class="screen" id="screen-year-intro">
+        <div style="font-size: 3rem; margin-bottom: 15px;" id="year-icon"></div>
+        <h2 style="font-family: 'Cinzel Decorative', cursive; color: var(--text-gold); font-size: 2rem; margin-bottom: 10px;" id="year-title"></h2>
+        <p style="margin-bottom: 30px; line-height: 1.7; max-width: 550px; margin-left: auto; margin-right: auto; opacity: 0.85;" id="year-description"></p>
+        <button class="btn" onclick="startTrivia()">Begin Classes</button>
+    </div>
+
+    <!-- TRIVIA -->
+    <div class="screen" id="screen-trivia">
+        <div class="hud" id="trivia-hud">
+            <div class="hud-item">Year: <span id="hud-year">1</span></div>
+            <div class="hud-item">House: <span id="hud-house">-</span></div>
+            <div class="hud-item">Points: <span id="hud-points">0</span></div>
+        </div>
+        <div class="year-progress">
+            <div class="year-progress-bar" id="trivia-progress-bar"></div>
+        </div>
+        <p class="trivia-category" id="trivia-category"></p>
+        <p class="trivia-question" id="trivia-question-text"></p>
+        <div class="trivia-options" id="trivia-options"></div>
+        <div class="trivia-feedback" id="trivia-feedback"></div>
+    </div>
+
+    <!-- SPELL DUEL -->
+    <div class="screen" id="screen-duel">
+        <div class="hud">
+            <div class="hud-item">Year: <span id="duel-hud-year">1</span></div>
+            <div class="hud-item">House: <span id="duel-hud-house">-</span></div>
+            <div class="hud-item">Points: <span id="duel-hud-points">0</span></div>
+        </div>
+        <h3 style="font-family: 'Cinzel', serif; color: var(--text-gold); letter-spacing: 2px; margin-bottom: 15px;">SPELL DUEL</h3>
+        <div class="duel-arena" id="duel-arena">
+            <div class="duelist">
+                <div class="duelist-icon" id="player-icon">&#129497;</div>
+                <div class="duelist-name" id="duel-player-name">Player</div>
+                <div class="health-bar-container">
+                    <div class="health-bar" id="player-health-bar" style="width: 100%"></div>
+                </div>
+                <div style="font-size: 0.8rem; margin-top: 4px;" id="player-hp-text">100 HP</div>
+            </div>
+            <div class="duel-vs">&#9889;</div>
+            <div class="duelist">
+                <div class="duelist-icon" id="enemy-icon">&#128128;</div>
+                <div class="duelist-name" id="enemy-name">Enemy</div>
+                <div class="health-bar-container">
+                    <div class="health-bar" id="enemy-health-bar" style="width: 100%"></div>
+                </div>
+                <div style="font-size: 0.8rem; margin-top: 4px;" id="enemy-hp-text">100 HP</div>
+            </div>
+        </div>
+        <p style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 10px;">Choose your spell:</p>
+        <div class="spell-choices" id="spell-choices"></div>
+        <div class="duel-log" id="duel-log"></div>
+    </div>
+
+    <!-- YEAR SUMMARY -->
+    <div class="screen" id="screen-year-summary">
+        <div class="year-summary">
+            <h2 id="summary-title">Year Complete!</h2>
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Trivia Correct</div>
+                    <div class="stat-value" id="summary-trivia"></div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Duel Result</div>
+                    <div class="stat-value" id="summary-duel"></div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Points Earned</div>
+                    <div class="stat-value" id="summary-points"></div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Points</div>
+                    <div class="stat-value" id="summary-total"></div>
+                </div>
+            </div>
+            <p style="font-style: italic; opacity: 0.7; margin-bottom: 20px;" id="summary-message"></p>
+            <button class="btn" id="summary-continue-btn" onclick="nextYear()">Continue to Next Year</button>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="screen" id="screen-final">
+        <div style="font-size: 4rem; margin-bottom: 15px;">&#127891;</div>
+        <h2 class="final-title">Graduation from Hogwarts</h2>
+        <p style="margin-bottom: 25px; font-style: italic; opacity: 0.8;" id="final-message"></p>
+        <div class="final-stats" id="final-stats"></div>
+        <div class="wizard-rank" id="wizard-rank"></div>
+        <br><br>
+        <button class="btn" onclick="restartGame()">Play Again</button>
+    </div>
+
+</div>
+
+<script>
+// ============================================================
+//  GAME STATE
+// ============================================================
+const state = {
+    playerName: 'Wizard',
+    house: null,
+    houseScores: { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 },
+    year: 1,
+    totalPoints: 0,
+    yearPoints: 0,
+    triviaCorrect: 0,
+    triviaTotal: 0,
+    duelsWon: 0,
+    duelsTotal: 0,
+    currentTrivia: [],
+    triviaIndex: 0,
+    playerHP: 100,
+    enemyHP: 100,
+    duelWon: false,
+    yearTriviaCorrect: 0,
+    yearTriviaTotal: 0,
+    sortingIndex: 0,
+};
+
+// ============================================================
+//  HOUSE DATA
+// ============================================================
+const houses = {
+    Gryffindor: {
+        crest: '\u{1F981}',
+        color: '#740001',
+        motto: '"Where dwell the brave at heart"',
+        description: 'Gryffindor values courage, bravery, and determination. Founded by Godric Gryffindor, its members are known for their daring and nerve.',
+    },
+    Slytherin: {
+        crest: '\u{1F40D}',
+        color: '#1A472A',
+        motto: '"Those cunning folk use any means to achieve their ends"',
+        description: 'Slytherin values ambition, cunning, and resourcefulness. Founded by Salazar Slytherin, its members are known for their shrewdness and self-preservation.',
+    },
+    Ravenclaw: {
+        crest: '\u{1F985}',
+        color: '#0E1A40',
+        motto: '"Wit beyond measure is man\'s greatest treasure"',
+        description: 'Ravenclaw values intelligence, creativity, and wisdom. Founded by Rowena Ravenclaw, its members are known for their sharp minds and love of learning.',
+    },
+    Hufflepuff: {
+        crest: '\u{1F9A1}',
+        color: '#ECB939',
+        motto: '"Those patient Hufflepuffs are true and unafraid of toil"',
+        description: 'Hufflepuff values hard work, patience, loyalty, and fair play. Founded by Helga Hufflepuff, its members are known for their dedication and kindness.',
+    },
+};
+
+// ============================================================
+//  SORTING QUESTIONS
+// ============================================================
+const sortingQuestions = [
+    {
+        question: 'You find a mysterious locked door in Hogwarts. What do you do?',
+        options: [
+            { text: 'Try to open it immediately \u2014 adventure awaits!', house: 'Gryffindor' },
+            { text: 'Research what\'s behind it before acting', house: 'Ravenclaw' },
+            { text: 'Find the key to unlock it strategically', house: 'Slytherin' },
+            { text: 'Ask a professor if it\'s safe first', house: 'Hufflepuff' },
+        ],
+    },
+    {
+        question: 'Which quality do you value most in yourself?',
+        options: [
+            { text: 'Courage and standing up for others', house: 'Gryffindor' },
+            { text: 'Loyalty and being a true friend', house: 'Hufflepuff' },
+            { text: 'Cleverness and a thirst for knowledge', house: 'Ravenclaw' },
+            { text: 'Ambition and the drive to succeed', house: 'Slytherin' },
+        ],
+    },
+    {
+        question: 'A troll is loose in the dungeon. What\'s your first instinct?',
+        options: [
+            { text: 'Rush in to confront it head-on', house: 'Gryffindor' },
+            { text: 'Devise a clever trap to contain it', house: 'Ravenclaw' },
+            { text: 'Let someone else handle it while you secure an exit', house: 'Slytherin' },
+            { text: 'Make sure everyone gets to safety first', house: 'Hufflepuff' },
+        ],
+    },
+    {
+        question: 'You discover a powerful magical artifact. What do you do with it?',
+        options: [
+            { text: 'Use it to protect those in need', house: 'Gryffindor' },
+            { text: 'Study it to understand its magic', house: 'Ravenclaw' },
+            { text: 'Keep it \u2014 power is a valuable thing', house: 'Slytherin' },
+            { text: 'Turn it in to the proper authorities', house: 'Hufflepuff' },
+        ],
+    },
+    {
+        question: 'Which path tempts you most?',
+        options: [
+            { text: 'The forest full of unknown creatures', house: 'Gryffindor' },
+            { text: 'The ancient library with forbidden books', house: 'Ravenclaw' },
+            { text: 'The hidden passage leading to a secret chamber', house: 'Slytherin' },
+            { text: 'The cozy garden with magical plants', house: 'Hufflepuff' },
+        ],
+    },
+];
+
+// ============================================================
+//  TRIVIA QUESTIONS BY YEAR
+// ============================================================
+const triviaByYear = {
+    1: [
+        { category: 'Potions', q: 'What potion is brewed in the first Potions class at Hogwarts?', options: ['Cure for Boils', 'Polyjuice Potion', 'Felix Felicis', 'Amortentia'], answer: 0 },
+        { category: 'Charms', q: 'What spell makes objects levitate?', options: ['Accio', 'Wingardium Leviosa', 'Lumos', 'Alohomora'], answer: 1 },
+        { category: 'Magical Creatures', q: 'What three-headed dog guards the trapdoor?', options: ['Fang', 'Norbert', 'Fluffy', 'Buckbeak'], answer: 2 },
+        { category: 'History', q: 'Who created the Philosopher\'s Stone?', options: ['Dumbledore', 'Grindelwald', 'Nicolas Flamel', 'Merlin'], answer: 2 },
+        { category: 'Quidditch', q: 'What position does Harry play on the Quidditch team?', options: ['Keeper', 'Chaser', 'Beater', 'Seeker'], answer: 3 },
+    ],
+    2: [
+        { category: 'Dark Arts', q: 'What is the name of the diary\'s owner that possesses Ginny?', options: ['Lucius Malfoy', 'Tom Riddle', 'Salazar Slytherin', 'Severus Snape'], answer: 1 },
+        { category: 'Magical Creatures', q: 'What creature lives in the Chamber of Secrets?', options: ['Dragon', 'Acromantula', 'Basilisk', 'Manticore'], answer: 2 },
+        { category: 'Herbology', q: 'What plant\'s cry can petrify someone?', options: ['Devil\'s Snare', 'Venomous Tentacula', 'Whomping Willow', 'Mandrake'], answer: 3 },
+        { category: 'Characters', q: 'Who is the Defence Against the Dark Arts teacher in Year 2?', options: ['Quirrell', 'Lockhart', 'Lupin', 'Moody'], answer: 1 },
+        { category: 'Spells', q: 'What spell does Hermione use to fix Harry\'s glasses?', options: ['Reparo', 'Episkey', 'Scourgify', 'Lumos'], answer: 0 },
+    ],
+    3: [
+        { category: 'Dark Arts', q: 'What are Dementors the guards of?', options: ['Hogwarts', 'Ministry', 'Azkaban', 'Gringotts'], answer: 2 },
+        { category: 'Magical Creatures', q: 'What is Buckbeak?', options: ['Phoenix', 'Thestral', 'Hippogriff', 'Griffin'], answer: 2 },
+        { category: 'Spells', q: 'What spell drives away Dementors?', options: ['Lumos Maxima', 'Expecto Patronum', 'Riddikulus', 'Protego'], answer: 1 },
+        { category: 'Characters', q: 'Who is Padfoot?', options: ['James Potter', 'Remus Lupin', 'Peter Pettigrew', 'Sirius Black'], answer: 3 },
+        { category: 'Artifacts', q: 'What magical map shows every person in Hogwarts?', options: ['Marauder\'s Map', 'Map of Ages', 'Dumbledore\'s Atlas', 'Wizard\'s Chart'], answer: 0 },
+    ],
+    4: [
+        { category: 'Triwizard', q: 'How many schools compete in the Triwizard Tournament?', options: ['2', '3', '4', '5'], answer: 1 },
+        { category: 'Dragons', q: 'What dragon does Harry face in the first task?', options: ['Common Welsh Green', 'Swedish Short-Snout', 'Chinese Fireball', 'Hungarian Horntail'], answer: 3 },
+        { category: 'Spells', q: 'Which Unforgivable Curse controls the victim?', options: ['Avada Kedavra', 'Crucio', 'Imperio', 'Sectumsempra'], answer: 2 },
+        { category: 'Characters', q: 'Who put Harry\'s name in the Goblet of Fire?', options: ['Snape', 'Karkaroff', 'Barty Crouch Jr.', 'Dumbledore'], answer: 2 },
+        { category: 'Artifacts', q: 'What does the Goblet of Fire select?', options: ['Prefects', 'Champions', 'Teachers', 'Ministers'], answer: 1 },
+    ],
+    5: [
+        { category: 'Organizations', q: 'What is the name of the secret group Harry teaches?', options: ['The Order', 'Dumbledore\'s Army', 'The Marauders', 'Phoenix Guard'], answer: 1 },
+        { category: 'Ministry', q: 'Who is the toad-like teacher sent by the Ministry?', options: ['Rita Skeeter', 'Dolores Umbridge', 'Madam Hooch', 'Narcissa Malfoy'], answer: 1 },
+        { category: 'Prophecy', q: 'Where is the prophecy about Harry and Voldemort kept?', options: ['Hogwarts', 'Gringotts', 'Department of Mysteries', 'Azkaban'], answer: 2 },
+        { category: 'Characters', q: 'Who is the leader of the Order of the Phoenix?', options: ['McGonagall', 'Dumbledore', 'Mad-Eye Moody', 'Sirius Black'], answer: 1 },
+        { category: 'Spells', q: 'What spell does Harry use to see if Snape is trustworthy (in Occlumency)?', options: ['Legilimens', 'Protego', 'Obliviate', 'Veritaserum'], answer: 0 },
+    ],
+    6: [
+        { category: 'Potions', q: 'What luck potion does Harry win from Slughorn?', options: ['Veritaserum', 'Wolfsbane', 'Felix Felicis', 'Polyjuice'], answer: 2 },
+        { category: 'Horcruxes', q: 'What was the first Horcrux to be destroyed?', options: ['The Locket', 'The Ring', 'The Diary', 'The Cup'], answer: 2 },
+        { category: 'Spells', q: 'What spell did Snape create that Harry uses against Malfoy?', options: ['Levicorpus', 'Sectumsempra', 'Langlock', 'Muffliato'], answer: 1 },
+        { category: 'Characters', q: 'Who is the Half-Blood Prince?', options: ['Voldemort', 'Dumbledore', 'Snape', 'Harry'], answer: 2 },
+        { category: 'Dark Arts', q: 'Who kills Dumbledore at the end of Year 6?', options: ['Voldemort', 'Draco', 'Snape', 'Bellatrix'], answer: 2 },
+    ],
+    7: [
+        { category: 'Horcruxes', q: 'How many Horcruxes did Voldemort create?', options: ['5', '6', '7', '8'], answer: 2 },
+        { category: 'Deathly Hallows', q: 'Which Hallow makes the wearer invisible?', options: ['Elder Wand', 'Resurrection Stone', 'Cloak of Invisibility', 'None'], answer: 2 },
+        { category: 'Characters', q: 'Who destroys the final Horcrux (Nagini)?', options: ['Harry', 'Ron', 'Hermione', 'Neville'], answer: 3 },
+        { category: 'Battle', q: 'Where does the final battle take place?', options: ['Ministry of Magic', 'Hogwarts', 'Godric\'s Hollow', 'Malfoy Manor'], answer: 1 },
+        { category: 'Wands', q: 'Who is the true master of the Elder Wand?', options: ['Dumbledore', 'Voldemort', 'Draco', 'Harry'], answer: 3 },
+    ],
+};
+
+// ============================================================
+//  DUEL ENEMIES BY YEAR
+// ============================================================
+const enemiesByYear = {
+    1: { name: 'Quirrell', icon: '\u{1F9D9}', hp: 70, damage: [8, 15] },
+    2: { name: 'Tom Riddle\'s Memory', icon: '\u{1F4D3}', hp: 80, damage: [10, 18] },
+    3: { name: 'Dementor', icon: '\u{1F47B}', hp: 85, damage: [12, 20] },
+    4: { name: 'Hungarian Horntail', icon: '\u{1F409}', hp: 100, damage: [15, 22] },
+    5: { name: 'Death Eater', icon: '\u{1F480}', hp: 100, damage: [14, 24] },
+    6: { name: 'Inferi', icon: '\u{1F9DF}', hp: 110, damage: [16, 25] },
+    7: { name: 'Lord Voldemort', icon: '\u{1F40D}', hp: 140, damage: [18, 30] },
+};
+
+// ============================================================
+//  SPELLS
+// ============================================================
+const spells = [
+    { name: 'Stupefy', type: 'Attack', damage: [15, 25], description: 'Stunning Spell' },
+    { name: 'Expelliarmus', type: 'Attack', damage: [12, 22], description: 'Disarming Charm' },
+    { name: 'Protego', type: 'Defense', block: [10, 25], description: 'Shield Charm' },
+    { name: 'Episkey', type: 'Heal', heal: [10, 20], description: 'Healing Spell' },
+];
+
+const advancedSpells = [
+    { name: 'Expecto Patronum', type: 'Attack', damage: [20, 35], description: 'Patronus Charm' },
+    { name: 'Sectumsempra', type: 'Attack', damage: [25, 40], description: 'Severing Curse' },
+    { name: 'Confringo', type: 'Attack', damage: [22, 38], description: 'Blasting Curse' },
+    { name: 'Vulnera Sanentur', type: 'Heal', heal: [18, 30], description: 'Healing Counter-curse' },
+];
+
+// ============================================================
+//  YEAR DESCRIPTIONS
+// ============================================================
+const yearData = {
+    1: { icon: '\u{1F3F0}', title: 'Year One', subtitle: 'The Philosopher\'s Stone', desc: 'You arrive at Hogwarts for the first time. The castle is vast and full of secrets. Something is hidden on the third-floor corridor...' },
+    2: { icon: '\u{1F4D6}', title: 'Year Two', subtitle: 'The Chamber of Secrets', desc: 'Strange things are happening at Hogwarts. Students are being petrified, and a mysterious voice echoes through the walls...' },
+    3: { icon: '\u{1F319}', title: 'Year Three', subtitle: 'The Prisoner of Azkaban', desc: 'A dangerous prisoner has escaped from Azkaban. Dementors patrol the grounds, and the truth about the past unfolds...' },
+    4: { icon: '\u{1F525}', title: 'Year Four', subtitle: 'The Goblet of Fire', desc: 'The Triwizard Tournament has come to Hogwarts. Champions must face deadly challenges, but dark forces lurk behind the spectacle...' },
+    5: { icon: '\u{26A1}', title: 'Year Five', subtitle: 'The Order of the Phoenix', desc: 'The Ministry denies the Dark Lord\'s return. You must prepare for war in secret while battling tyranny within the school...' },
+    6: { icon: '\u{1F48E}', title: 'Year Six', subtitle: 'The Half-Blood Prince', desc: 'Secrets of Voldemort\'s past come to light. The hunt for Horcruxes begins, and loyalties are tested like never before...' },
+    7: { icon: '\u{2694}\uFE0F', title: 'Year Seven', subtitle: 'The Deathly Hallows', desc: 'The final battle approaches. Hogwarts stands as the last bastion of hope against the darkness. Everything ends here...' },
+};
+
+// ============================================================
+//  SCREEN MANAGEMENT
+// ============================================================
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const screen = document.getElementById('screen-' + id);
+    screen.classList.remove('active');
+    // Force reflow for animation
+    void screen.offsetWidth;
+    screen.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+//  PARTICLES
+// ============================================================
+function createParticles() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 6 + 's';
+        p.style.animationDuration = (4 + Math.random() * 4) + 's';
+        container.appendChild(p);
+    }
+}
+
+// ============================================================
+//  TITLE / NAME
+// ============================================================
+function startSorting() {
+    showScreen('name');
+    setTimeout(() => document.getElementById('player-name-input').focus(), 300);
+}
+
+function confirmName() {
+    const input = document.getElementById('player-name-input').value.trim();
+    state.playerName = input || 'Wizard';
+    state.sortingIndex = 0;
+    state.houseScores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
+    showScreen('sorting');
+    showSortingQuestion();
+}
+
+// ============================================================
+//  SORTING
+// ============================================================
+function showSortingQuestion() {
+    const q = sortingQuestions[state.sortingIndex];
+    document.getElementById('sorting-question').textContent = q.question;
+    document.getElementById('sorting-progress').textContent = `Question ${state.sortingIndex + 1} of ${sortingQuestions.length}`;
+
+    const container = document.getElementById('sorting-options');
+    container.innerHTML = '';
+    // Shuffle options for variety
+    const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+    shuffled.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'sorting-option';
+        btn.textContent = opt.text;
+        btn.onclick = () => pickSortingOption(opt.house);
+        container.appendChild(btn);
+    });
+}
+
+function pickSortingOption(house) {
+    state.houseScores[house]++;
+    state.sortingIndex++;
+    if (state.sortingIndex < sortingQuestions.length) {
+        showSortingQuestion();
+    } else {
+        revealHouse();
+    }
+}
+
+function revealHouse() {
+    // Determine house with highest score (random tiebreak)
+    let maxScore = 0;
+    let topHouses = [];
+    for (const [h, s] of Object.entries(state.houseScores)) {
+        if (s > maxScore) {
+            maxScore = s;
+            topHouses = [h];
+        } else if (s === maxScore) {
+            topHouses.push(h);
+        }
+    }
+    state.house = topHouses[Math.floor(Math.random() * topHouses.length)];
+
+    const h = houses[state.house];
+    document.getElementById('house-crest').textContent = h.crest;
+    const nameEl = document.getElementById('house-name-display');
+    nameEl.textContent = state.house;
+    nameEl.style.color = h.color;
+    document.getElementById('house-motto').textContent = h.motto;
+    document.getElementById('house-description').textContent = h.description;
+
+    showScreen('house-reveal');
+}
+
+// ============================================================
+//  YEAR FLOW
+// ============================================================
+function startYear() {
+    const yd = yearData[state.year];
+    document.getElementById('year-icon').textContent = yd.icon;
+    document.getElementById('year-title').textContent = `${yd.title} \u2014 ${yd.subtitle}`;
+    document.getElementById('year-description').textContent = yd.desc;
+    showScreen('year-intro');
+}
+
+function startTrivia() {
+    state.yearPoints = 0;
+    state.yearTriviaCorrect = 0;
+    state.yearTriviaTotal = 0;
+
+    // Pick 3 random trivia for this year
+    const pool = [...triviaByYear[state.year]];
+    state.currentTrivia = shuffle(pool).slice(0, 3);
+    state.triviaIndex = 0;
+
+    updateHUD();
+    showScreen('trivia');
+    showTriviaQuestion();
+}
+
+function updateHUD() {
+    const sets = [
+        ['hud-year', 'hud-house', 'hud-points'],
+        ['duel-hud-year', 'duel-hud-house', 'duel-hud-points'],
+    ];
+    sets.forEach(([yId, hId, pId]) => {
+        const yEl = document.getElementById(yId);
+        const hEl = document.getElementById(hId);
+        const pEl = document.getElementById(pId);
+        if (yEl) yEl.textContent = state.year;
+        if (hEl) hEl.textContent = state.house;
+        if (pEl) pEl.textContent = state.totalPoints;
+    });
+}
+
+// ============================================================
+//  TRIVIA
+// ============================================================
+function showTriviaQuestion() {
+    const t = state.currentTrivia[state.triviaIndex];
+    document.getElementById('trivia-category').textContent = t.category;
+    document.getElementById('trivia-question-text').textContent = t.q;
+    document.getElementById('trivia-feedback').innerHTML = '';
+
+    const progressPct = (state.triviaIndex / state.currentTrivia.length) * 100;
+    document.getElementById('trivia-progress-bar').style.width = progressPct + '%';
+
+    const container = document.getElementById('trivia-options');
+    container.innerHTML = '';
+    t.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'trivia-option';
+        btn.textContent = opt;
+        btn.onclick = () => answerTrivia(i);
+        container.appendChild(btn);
+    });
+}
+
+function answerTrivia(selected) {
+    const t = state.currentTrivia[state.triviaIndex];
+    const buttons = document.querySelectorAll('.trivia-option');
+    const feedback = document.getElementById('trivia-feedback');
+
+    buttons.forEach((btn, i) => {
+        btn.classList.add('disabled');
+        btn.onclick = null;
+        if (i === t.answer) btn.classList.add('correct');
+        if (i === selected && selected !== t.answer) btn.classList.add('incorrect');
+    });
+
+    state.yearTriviaTotal++;
+    state.triviaTotal++;
+
+    if (selected === t.answer) {
+        const pts = 10 + state.year * 5;
+        state.yearPoints += pts;
+        state.totalPoints += pts;
+        state.triviaCorrect++;
+        state.yearTriviaCorrect++;
+        feedback.innerHTML = `Correct! <span class="points">+${pts} points</span>`;
+    } else {
+        feedback.innerHTML = `Wrong! The answer was: <strong>${t.options[t.answer]}</strong>`;
+    }
+
+    updateHUD();
+
+    setTimeout(() => {
+        state.triviaIndex++;
+        if (state.triviaIndex < state.currentTrivia.length) {
+            showTriviaQuestion();
+        } else {
+            document.getElementById('trivia-progress-bar').style.width = '100%';
+            setTimeout(() => startDuel(), 600);
+        }
+    }, 1800);
+}
+
+// ============================================================
+//  SPELL DUEL
+// ============================================================
+function startDuel() {
+    const enemy = enemiesByYear[state.year];
+    state.playerHP = 100;
+    state.enemyHP = enemy.hp;
+    state.duelWon = false;
+
+    document.getElementById('duel-player-name').textContent = state.playerName;
+    document.getElementById('enemy-name').textContent = enemy.name;
+    document.getElementById('enemy-icon').textContent = enemy.icon;
+    document.getElementById('duel-log').textContent = `${enemy.name} appears! Prepare to duel!`;
+
+    updateHealthBars();
+    updateHUD();
+    renderSpellButtons();
+    showScreen('duel');
+}
+
+function getAvailableSpells() {
+    if (state.year >= 5) return [...spells, ...advancedSpells];
+    if (state.year >= 3) return [...spells, advancedSpells[0]]; // Add Patronus in year 3
+    return [...spells];
+}
+
+function renderSpellButtons() {
+    const container = document.getElementById('spell-choices');
+    container.innerHTML = '';
+    const available = getAvailableSpells();
+    available.forEach((spell, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'spell-btn';
+        btn.innerHTML = `<span class="spell-name">${spell.name}</span><span class="spell-type">${spell.description} (${spell.type})</span>`;
+        btn.onclick = () => castSpell(i);
+        container.appendChild(btn);
+    });
+}
+
+function castSpell(index) {
+    const available = getAvailableSpells();
+    const spell = available[index];
+    const enemy = enemiesByYear[state.year];
+    const log = document.getElementById('duel-log');
+    let msg = '';
+
+    // Disable buttons during turn
+    document.querySelectorAll('.spell-btn').forEach(b => b.onclick = null);
+
+    // Player action
+    if (spell.type === 'Attack') {
+        const dmg = randRange(spell.damage[0], spell.damage[1]);
+        state.enemyHP = Math.max(0, state.enemyHP - dmg);
+        msg = `You cast ${spell.name}! ${enemy.name} takes ${dmg} damage. `;
+    } else if (spell.type === 'Defense') {
+        const block = randRange(spell.block[0], spell.block[1]);
+        // Store block for enemy turn
+        state._block = block;
+        msg = `You cast ${spell.name}! You brace to block up to ${block} damage. `;
+    } else if (spell.type === 'Heal') {
+        const heal = randRange(spell.heal[0], spell.heal[1]);
+        state.playerHP = Math.min(100, state.playerHP + heal);
+        msg = `You cast ${spell.name}! You recover ${heal} HP. `;
+    }
+
+    // Flash effect
+    document.getElementById('duel-arena').classList.add('spell-flash');
+    setTimeout(() => document.getElementById('duel-arena').classList.remove('spell-flash'), 300);
+
+    updateHealthBars();
+
+    // Check enemy defeated
+    if (state.enemyHP <= 0) {
+        state.duelWon = true;
+        state.duelsWon++;
+        state.duelsTotal++;
+        const pts = 20 + state.year * 10;
+        state.yearPoints += pts;
+        state.totalPoints += pts;
+        msg += `${enemy.name} is defeated! +${pts} points!`;
+        log.textContent = msg;
+        updateHUD();
+        setTimeout(() => showYearSummary(), 2000);
+        return;
+    }
+
+    // Enemy turn after delay
+    setTimeout(() => {
+        let enemyDmg = randRange(enemy.damage[0], enemy.damage[1]);
+        if (state._block) {
+            enemyDmg = Math.max(0, enemyDmg - state._block);
+            state._block = 0;
+        }
+        state.playerHP = Math.max(0, state.playerHP - enemyDmg);
+        msg += `${enemy.name} strikes for ${enemyDmg} damage!`;
+        log.textContent = msg;
+        updateHealthBars();
+
+        if (state.playerHP <= 0) {
+            state.duelsTotal++;
+            log.textContent = msg + ' You have been defeated...';
+            setTimeout(() => showYearSummary(), 2000);
+            return;
+        }
+
+        // Re-enable spell buttons
+        renderSpellButtons();
+    }, 800);
+
+    log.textContent = msg;
+}
+
+function updateHealthBars() {
+    const enemy = enemiesByYear[state.year];
+    const pPct = Math.max(0, (state.playerHP / 100) * 100);
+    const ePct = Math.max(0, (state.enemyHP / enemy.hp) * 100);
+
+    document.getElementById('player-health-bar').style.width = pPct + '%';
+    document.getElementById('enemy-health-bar').style.width = ePct + '%';
+    document.getElementById('player-hp-text').textContent = Math.max(0, state.playerHP) + ' HP';
+    document.getElementById('enemy-hp-text').textContent = Math.max(0, state.enemyHP) + ' HP';
+}
+
+// ============================================================
+//  YEAR SUMMARY
+// ============================================================
+function showYearSummary() {
+    document.getElementById('summary-title').textContent = `Year ${state.year} Complete!`;
+    document.getElementById('summary-trivia').textContent = `${state.yearTriviaCorrect} / ${state.yearTriviaTotal}`;
+    document.getElementById('summary-duel').textContent = state.duelWon ? 'Victory!' : 'Defeated';
+    document.getElementById('summary-points').textContent = `+${state.yearPoints}`;
+    document.getElementById('summary-total').textContent = state.totalPoints;
+
+    const messages = [
+        'A promising start to your wizarding journey.',
+        'You are proving yourself a capable young wizard.',
+        'Your magical abilities continue to grow.',
+        'You\'ve faced incredible challenges and persevered.',
+        'Dark times are ahead, but your resolve is strong.',
+        'The weight of destiny grows heavier, but so does your power.',
+        'The final chapter of your Hogwarts story has been written.',
+    ];
+    document.getElementById('summary-message').textContent = messages[state.year - 1];
+
+    if (state.year >= 7) {
+        document.getElementById('summary-continue-btn').textContent = 'View Final Results';
+        document.getElementById('summary-continue-btn').onclick = showFinal;
+    } else {
+        document.getElementById('summary-continue-btn').textContent = 'Continue to Next Year';
+        document.getElementById('summary-continue-btn').onclick = nextYear;
+    }
+
+    showScreen('year-summary');
+}
+
+function nextYear() {
+    state.year++;
+    startYear();
+}
+
+// ============================================================
+//  FINAL SCREEN
+// ============================================================
+function showFinal() {
+    const statsContainer = document.getElementById('final-stats');
+    const totalPossibleTrivia = state.triviaTotal;
+    const stats = [
+        ['Wizard Name', state.playerName],
+        ['House', state.house],
+        ['Total Points', state.totalPoints],
+        ['Trivia Score', `${state.triviaCorrect} / ${totalPossibleTrivia}`],
+        ['Duels Won', `${state.duelsWon} / ${state.duelsTotal}`],
+    ];
+
+    statsContainer.innerHTML = stats.map(([label, value]) =>
+        `<div class="final-stat"><span class="final-stat-label">${label}</span><span class="final-stat-value">${value}</span></div>`
+    ).join('');
+
+    // Determine rank
+    let rank;
+    if (state.totalPoints >= 600) rank = 'Master of the Elder Wand';
+    else if (state.totalPoints >= 450) rank = 'Order of Merlin, First Class';
+    else if (state.totalPoints >= 300) rank = 'Outstanding Wizard';
+    else if (state.totalPoints >= 150) rank = 'Exceeds Expectations';
+    else rank = 'Acceptable Wizard';
+
+    document.getElementById('wizard-rank').textContent = rank;
+    document.getElementById('final-message').textContent =
+        `After seven years at Hogwarts, ${state.playerName} of ${state.house} has completed their journey. The wizarding world will remember this name.`;
+
+    showScreen('final');
+}
+
+// ============================================================
+//  RESTART
+// ============================================================
+function restartGame() {
+    state.year = 1;
+    state.totalPoints = 0;
+    state.triviaCorrect = 0;
+    state.triviaTotal = 0;
+    state.duelsWon = 0;
+    state.duelsTotal = 0;
+    showScreen('title');
+}
+
+// ============================================================
+//  UTILITIES
+// ============================================================
+function randRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+createParticles();
+</script>
+
+</body>
+</html>
